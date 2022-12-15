@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/usr/app
+    ports:
+      - 8080:8000
+    environment:
+      - DATABASE_URL=postgresql://apiconsumer:apiconsumer@db:5432/apiconsumer
+      - CLUSTER_URL=http://docker.for.mac.localhost:8088/api/v1/cluster
+    depends_on:
+      - db
+  web_cluster:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/usr/app
+    ports:
+      - 8088:8000
+    environment:
+      - DATABASE_URL=postgresql://apiconsumer:apiconsumer@db:5432/apiconsumer
+    depends_on:
+      - db
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=apiconsumer
+      - POSTGRES_PASSWORD=apiconsumer
+      - POSTGRES_DB=apiconsumer
+
+volumes:
+  postgres_data:
+
+
+
+    
